@@ -120,3 +120,40 @@ wordcloud = WordCloud().generate(text)
 plt.imshow(wordcloud, interpolation="bilinear")
 plt.axis("off")
 plt.show()
+
+# Sentiment Analysis
+
+from nltk.sentiment import SentimentIntensityAnalyzer
+import nltk
+nltk.download('vader_lexicon')
+
+sia = SentimentIntensityAnalyzer()
+
+sia.polarity_scores("The film was awesome")
+
+#sia.polarity_scores("Very nice performance Only thing that is missing in kit is cable wire battery for remote AC Copper wire tape Installation charges were least  plus gst  However they add accessories like outdoor unit angle stand tape power cable  core drainage pipe tape installation charges separately though its mandatory work They all add up to ")
+
+sia.polarity_scores("I liked this music but it is not good as the other one")
+
+sia.polarity_scores("I have it in my phone and it never skips a beat. File transfers are speedy and have not had any corruption issues or memory fade issues as I would expect from the Sandisk brand. Great card to own. Why entrust your precious files to a slightly cheaper piece of crap? If you lose everything can you forgive yourself for not spending the extra couple bucks on a trusted product that goes through good QA?")
+
+sia.polarity_scores("THE NAME OF ITSELF SPEAKS OUT. GO SANDISK GO!")
+
+df["reviewText"][0:10].apply(lambda x: sia.polarity_scores(x))
+
+df["reviewText"][0:10].apply(lambda x: sia.polarity_scores(x)["compound"])
+
+df["polarity_score"] = df["reviewText"].apply(lambda x: sia.polarity_scores(x)["compound"])
+
+df["sentiment_label"] = df["reviewText"].apply(lambda x: "pos" if sia.polarity_scores(x)["compound"] > 0 else "neg")
+
+df["sentiment_label"].value_counts()
+
+df.groupby("sentiment_label")["overall"].mean()
+
+df["sentiment_label"] = LabelEncoder().fit_transform(df["sentiment_label"])
+
+y = df["sentiment_label"]
+X = df["reviewText"]
+
+df.head(40)
