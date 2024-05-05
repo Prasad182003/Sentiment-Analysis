@@ -12,3 +12,7 @@ Sentiment analysis is the process of identifying and categorizing opinions expre
 - Logistic Regression: Logistic Regression is a popular algorithm used for binary classification tasks. We train a Logistic Regression model to classify Amazon comments into positive or negative sentiments.
 - Random Forest: Random Forest is an ensemble learning method that operates by constructing multiple decision trees during training and outputting the mode of the classes as the prediction. We utilize Random Forest for sentiment analysis to compare its performance with Logistic Regression.
 - Hyperparameter Optimization: Hyperparameters are parameters that are not directly learnt within estimators. In this project, we perform hyperparameter optimization to fine-tune the parameters of our models, aiming for improved performance.
+
+
+## Contributing
+Contributions are welcome! If you'd like to contribute to this project, please fork the repository, make your changes, and submit a pull request.
