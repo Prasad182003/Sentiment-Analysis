@@ -157,3 +157,47 @@ y = df["sentiment_label"]
 X = df["reviewText"]
 
 df.head(40)
+
+""" hrushikesh's code
+
+
+"""
+# Define the Random Forest model
+rf_model = RandomForestClassifier()
+
+# Evaluate RandomForestClassifier with CountVectorizer
+print("Evaluation for RandomForestClassifier with CountVectorizer:")
+evaluate_model(rf_model, X_count, y)
+
+# Evaluate RandomForestClassifier with TF-IDF (word-level)
+print("\nEvaluation for RandomForestClassifier with TF-IDF (word-level):")
+evaluate_model(rf_model, X_tf_idf_word, y)
+
+# Evaluate RandomForestClassifier with TF-IDF (ngram-level)
+print("\nEvaluation for RandomForestClassifier with TF-IDF (ngram-level):")
+evaluate_model(rf_model, X_tf_idf_ngram, y)
+
+# Hyperparameter tuning
+rf_params = {
+    "max_depth": [8, None],
+    "max_features": [7, "auto"],
+    "min_samples_split": [2, 5, 8],
+    "n_estimators": [100, 200]
+}
+rf_best_grid = GridSearchCV(
+    rf_model,
+    rf_params,
+    cv=5,
+    n_jobs=-1,
+    verbose=1
+).fit(X_count, y)
+
+# Best parameters
+print("Best parameters:", rf_best_grid.best_params_)
+
+# Final model with best parameters
+rf_final = RandomForestClassifier(**rf_best_grid.best_params_, random_state=17).fit(X_count, y)
+
+# Evaluate final model with improved parameters
+print("\nEvaluation for RandomForestClassifier with CountVectorizer (Improved Parameters):")
+evaluate_model(rf_final, X_count, y)
