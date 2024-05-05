@@ -1,7 +1,7 @@
-!pip install nltk
-!pip install twython
-!pip install textblob
-!pip install wordcloud
+# !pip install nltk
+# !pip install twython
+# !pip install textblob
+# !pip install wordcloud
 
 from warnings import filterwarnings
 import matplotlib.pyplot as plt
@@ -158,10 +158,78 @@ X = df["reviewText"]
 
 df.head(40)
 
-""" hrushikesh's code
+# Count Vectors
+from sklearn.feature_extraction.text import CountVectorizer
+
+vectorizer = CountVectorizer()
+X_count = vectorizer.fit_transform(X)
+
+# N-Gram Frequency
+vectorizer2 = CountVectorizer(analyzer='word', ngram_range=(2, 2))
+X_n = vectorizer2.fit_transform(X)
+
+# TF-IDF Word
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+tf_idf_word_vectorizer = TfidfVectorizer()
+X_tf_idf_word = tf_idf_word_vectorizer.fit_transform(X)
+
+# TF-IDF N-Gram
+tf_idf_ngram_vectorizer = TfidfVectorizer(ngram_range=(2, 3))
+X_tf_idf_ngram = tf_idf_ngram_vectorizer.fit_transform(X)
+
+# Define the pipeline
+pipeline = Pipeline([
+    ('tfidf', TfidfVectorizer()),
+    ('logistic', LogisticRegression())
+])
+
+# Define the hyperparameters grid
+param_grid = {
+    'tfidf__max_features': [1000, 2000, 3000],  # You can adjust these values
+    'logistic__C': [0.1, 1.0, 10.0],  # Regularization parameter
+}
+
+# Perform grid search
+grid_search = GridSearchCV(pipeline, param_grid, cv=5, scoring='accuracy')
+grid_search.fit(X, y)
+
+# Get the best hyperparameters
+best_params = grid_search.best_params_
+print("Best Hyperparameters:", best_params)
+
+# Get the best model
+best_model = grid_search.best_estimator_
+
+# Cross-validation for accuracy
+accuracy = cross_val_score(best_model, X, y, scoring="accuracy", cv=5).mean()
 
 
-"""
+# Cross-validation for precision
+precision_scores = cross_val_score(best_model, X, y, scoring="precision", cv=5).mean()
+
+# Cross-validation for other metrics
+f1_scores = cross_val_score(best_model, X, y, scoring="f1", cv=5).mean()
+recall_scores = cross_val_score(best_model, X, y, scoring="recall", cv=5).mean()
+auc_scores = cross_val_score(best_model, X, y, scoring="roc_auc", cv=5).mean()
+
+# Confusion matrix
+y_pred = best_model.predict(X)
+conf_matrix = confusion_matrix(y, y_pred)
+
+# Classification report
+class_report = classification_report(y, y_pred)
+
+# Output the results
+print("Accuracy:", accuracy)
+print("Precision:", precision_scores)
+print("F1 Score:", f1_scores)
+print("Recall:", recall_scores)
+print("AUC Score:", auc_scores)
+print("Confusion Matrix:\n", conf_matrix)
+print("Classification Report:\n", class_report)
+
+
 # Define the Random Forest model
 rf_model = RandomForestClassifier()
 
