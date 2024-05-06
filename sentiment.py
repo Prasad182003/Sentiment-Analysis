@@ -228,3 +228,79 @@ print("Recall:", recall_scores)
 print("AUC Score:", auc_scores)
 print("Confusion Matrix:\n", conf_matrix)
 print("Classification Report:\n", class_report)
+
+#random forest
+from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+
+# Define a function to print evaluation metrics
+def print_evaluation_metrics(y_true, y_pred):
+    # Accuracy
+    accuracy = accuracy_score(y_true, y_pred)
+    print("Accuracy:", accuracy)
+    
+    # Precision
+    precision = precision_score(y_true, y_pred)
+    print("Precision:", precision)
+    
+    # Recall
+    recall = recall_score(y_true, y_pred)
+    print("Recall:", recall)
+    
+    # F1 Score
+    f1 = f1_score(y_true, y_pred)
+    print("F1 Score:", f1)
+    
+    # AUC Score (not available for multi-class classification, works for binary classification)
+    auc = roc_auc_score(y_true, y_pred)
+    print("AUC Score:", auc)
+    
+    # Confusion Matrix
+    cm = confusion_matrix(y_true, y_pred)
+    print("Confusion Matrix:\n", cm)
+    
+    # Classification Report
+    print("Classification Report:\n", classification_report(y_true, y_pred))
+
+# Model Evaluation
+
+rf_model = RandomForestClassifier()
+
+print("Evaluation for RandomForestClassifier with CountVectorizer:")
+y_pred_count = cross_val_predict(rf_model, X_count, y, cv=5)
+print_evaluation_metrics(y, y_pred_count)
+
+print("\nEvaluation for RandomForestClassifier with TF-IDF (word-level):")
+y_pred_tf_idf_word = cross_val_predict(rf_model, X_tf_idf_word, y, cv=5)
+print_evaluation_metrics(y, y_pred_tf_idf_word)
+
+print("\nEvaluation for RandomForestClassifier with TF-IDF (ngram-level):")
+y_pred_tf_idf_ngram = cross_val_predict(rf_model, X_tf_idf_ngram, y, cv=5)
+print_evaluation_metrics(y, y_pred_tf_idf_ngram)
+
+# Hyperparameter tuning (you can modify this part accordingly)
+rf_params = {   
+        
+    "max_depth": [8, None],
+    "max_features": [7, "auto"],
+    "min_samples_split": [2, 5, 8],
+    "n_estimators": [100, 200]
+    
+}
+rf_best_grid = GridSearchCV(
+    rf_model,
+    rf_params,
+    cv=5,
+    n_jobs=-1,
+    verbose=1
+).fit(X_count, y)
+
+# Best parameters
+print("Best parameters:", rf_best_grid.best_params_)
+
+# Final model with best parameters
+rf_final = RandomForestClassifier(**rf_best_grid.best_params_, random_state=17).fit(X_count, y)
+
+# Evaluate final model with improved parameters
+print("\nEvaluation for RandomForestClassifier with CountVectorizer (Improved Parameters):")
+y_pred_final = cross_val_predict(rf_final, X_count, y, cv=5)
+print_evaluation_metrics(y, y_pred_final)
